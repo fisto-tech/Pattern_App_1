@@ -1,0 +1,415 @@
+/* roboto-regular - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/roboto-v49-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* roboto-500 - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/roboto-v49-latin-500.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* roboto-600 - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 600;
+  src: url('../fonts/roboto-v49-latin-600.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+.model {
+  height: 90%;
+  background-color: #c7c7c7;
+}
+
+.model_view {
+    /* background-color: red; */
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  /* border-bottom: 2px solid black; */
+  position: relative; /* Core for absolute overlay */
+}
+
+#mainViewer{
+  /* background: linear-gradient(180deg, #fff, #f7f8fa); */
+  width: 100%;
+  height: 100%;
+}
+
+.model h3 {
+  font-size: 1.1vw;
+  font-weight: 600;
+  color: #333;
+}
+
+.model_file {
+  height: 10%;
+  border-top: 0.15vw solid black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5vw;
+  background-color: white;
+}
+
+/* Contrast Control Spans & Headers */
+.model-control-span {
+  font-size: 0.85vw;
+  font-weight: 500;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+#mainModelTitle {
+  margin: 0;
+  font-size: 0.9vw;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+/* Dark Mode Overrides */
+#modelcontainer.bg-dark .model-control-span,
+#modelcontainer.bg-dark #mainModelTitle,
+#modelcontainer.bg-dark .model-loader-overlay p {
+  color: #ffffff !important;
+}
+
+#modelcontainer.bg-dark {
+  border-color: #444; /* Darker border when bg is dark */
+}
+
+.footer-section {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+}
+
+/* Styled Select */
+.styled-select {
+  padding: 0.4vw 0.8vw;
+  border: 0.1vw solid #ccc;
+  border-radius: 0.4vw;
+  font-size: 0.85vw;
+  font-weight: 500;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.styled-select:hover {
+  border-color: #fbd238;
+}
+
+/* Color Options (Radios) */
+.color-options {
+  display: flex;
+  gap: 1vw;
+  align-items: center;
+}
+
+.color-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.4vw;
+  font-size: 0.85vw;
+  font-weight: 500;
+  cursor: pointer;
+  text-transform: capitalize;
+  color: #333;
+  transition: opacity 0.2s;
+}
+
+.color-options label:hover {
+  opacity: 0.8;
+}
+
+.color-options input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #bbb;
+  border-radius: 50%;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.color-options input[type="radio"]:checked {
+  border-color: #fbd238;
+}
+
+.color-options input[type="radio"]::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background-color: #d5a805;
+  border-radius: 50%;
+  display: block;
+  transform: scale(0);
+  transition: transform 0.2s ease;
+}
+
+.color-options input[type="radio"]:checked::after {
+  transform: scale(1);
+}
+
+/* Custom Color Picker Image */
+.custom-color-picker {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.custom-color-picker:hover {
+  transform: scale(1.1);
+}
+
+.custom-color-picker img {
+  width: 1.8vw;
+  height: 1.8vw;
+  object-fit: contain;
+}
+
+/* Background Section */
+.bg-controls label {
+  font-size: 0.85vw;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Export Section */
+.export-controls {
+  gap: 0.6vw;
+}
+
+.primary-btn {
+  padding: 0.4vw 1.2vw;
+  font-size: 0.85vw;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.4vw;
+  background: #fbd238;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0.1vw 0.3vw rgba(0,0,0,0.1);
+}
+
+.primary-btn:hover {
+  background: #e5bf33;
+  transform: translateY(-1px);
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+.category-section {
+  margin-bottom: 1.2vw;
+}
+
+.category-section h4 {
+  margin: 0.6vw 0;
+  color: #333;
+}
+
+.category-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vw;
+}
+
+.colour_picker {
+  display: flex;
+  align-items: center;
+  gap: 0.6vw;
+  margin: 0.6vw 0;
+}
+
+.colour_picker label {
+  font-size: 0.85vw;
+  font-weight: 500;
+  color: #333;
+}
+
+.pickr .pcr-button{
+  visibility: hidden;
+}
+
+/* Removes default styling in browsers */
+.colour_picker input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 0.5vw;
+}
+.colour_picker input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 0.5vw;
+}
+
+/* Auto Rotate Toggle - Unique Classes to prevent sidebar interference */
+.rotate-switch {
+  position: relative;
+  display: inline-block;
+  width: 2.4vw;
+  height: 1.2vw;
+}
+
+.rotate-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.rotate-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 1.2vw;
+}
+
+.rotate-slider:before {
+  position: absolute;
+  content: "";
+  height: 0.9vw;
+  width: 0.9vw;
+  left: 0.15vw;
+  bottom: 0.15vw;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.rotate-switch input:checked + .rotate-slider {
+  background-color: #fbd238;
+}
+
+.rotate-switch input:focus + .rotate-slider {
+  box-shadow: 0 0 1px #fbd238;
+}
+
+.rotate-switch input:checked + .rotate-slider:before {
+  transform: translateX(1.2vw);
+}
+
+/* Viewer Controls (Zoom & Reset) */
+.viewer-controls {
+  position: absolute;
+  bottom: 1.5vw;
+  right: 1.5vw; /* Moved to rightside end */
+  display: flex;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.glass-group {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.3vw;
+  border-radius: 5vw;
+  border: 0.1vw solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0.4vw 1.2vw rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 0.4vw;
+  pointer-events: auto;
+}
+
+.control-btn {
+  width: 2.15vw;
+  height: 2.15vw;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9vw;
+  color: #444;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0.1vw 0.3vw rgba(0,0,0,0.08);
+}
+
+.control-btn:hover {
+  background: #997d18;
+  color: white;
+  transform: scale(1.1);
+}
+
+.control-btn:active {
+  transform: scale(0.92);
+}
+
+.control-btn i {
+  pointer-events: none;
+}
+
+
+/* Model Loader Overlay for smooth switching */
+.model-loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(199, 199, 199);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 200; /* Above viewer controls */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Keep transition for fade-out */
+}
+
+.model-loader-overlay.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: none !important; /* Instant appear */
+}
+
+.model-loader-overlay .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #fbd238;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+.model-loader-overlay p {
+  font-size: 0.9vw;
+  font-weight: 500;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

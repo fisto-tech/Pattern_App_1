@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pattern Upload</title>
+    <link rel="stylesheet" href="pattern.css?v=3" />
+    <link rel="stylesheet" href="./css/fontawesome.min.css">
+    <link rel="stylesheet" href="./css/solid.min.css">
+    <link rel="stylesheet" href="./css/regular.min.css">
+    <link rel="stylesheet" href="./css/svg-with-js.min.css">
+  </head>
+  <body>
+    <div class="pattern-wrapper">
+      <div class="pattern-header">
+        <h2>Pattern List</h2>
+        <div class="header-controls">
+          <div class="control-group">
+            <label>Select Type</label>
+            <select id="shape-filter" class="filter-select">
+              <option value="">All Types</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Select Category</label>
+            <select id="category-filter" class="filter-select">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Global Hidden Upload Input -->
+      <input type="file" id="global-pattern-file" accept="image/*" style="display: none;" />
+
+      <!-- Patterns Grid View -->
+      <div id="pattern-grid-container" class="pattern-grid-container">
+        <!-- Category sections will be rendered here -->
+        <div class="loading-state">Loading patterns...</div>
+      </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title">Upload Pattern</h3>
+          <span class="close-modal" id="close-upload-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div id="upload-instruction" style="font-size: 0.85vw; margin-bottom: 1vw; color: #666;"></div>
+          
+          <div class="upload-slots" id="upload-slots">
+            <!-- Slot 1: Lid -->
+            <div class="upload-slot" id="slot-top">
+              <label id="label-top">Pattern (Lid)</label>
+              <div class="upload-area" id="trigger-top">
+                <input type="file" id="file-top" accept="image/*" hidden />
+                <div id="preview-top" class="preview-container">
+                  <i class="fa-solid fa-cloud-upload-alt"></i>
+                  <p>Click to Upload</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slot 2: Tub -->
+            <div class="upload-slot" id="slot-primary">
+              <label id="label-primary">Pattern (Tub)</label>
+              <div class="upload-area" id="trigger-primary">
+                <input type="file" id="file-primary" accept="image/*" hidden />
+                <div id="preview-primary" class="preview-container">
+                  <i class="fa-solid fa-cloud-upload-alt"></i>
+                  <p>Click to Upload</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" id="btn-cancel-upload">Cancel</button>
+          <button class="submit-btn" id="btn-submit-upload">Save Pattern</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

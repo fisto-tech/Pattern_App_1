@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="./assets/Logo/logo-icon.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="./css/fontawesome.min.css">
+    <link rel="stylesheet" href="./css/solid.min.css">
+    <link rel="stylesheet" href="./css/regular.min.css">
+    <link rel="stylesheet" href="./css/svg-with-js.min.css">
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="./styles/nav.css" />
+    <link rel="stylesheet" href="./styles/left_sidebar.css" />
+    <link rel="stylesheet" href="./styles/right_sidebar.css" />
+    <link rel="stylesheet" href="./styles/maincontent.css" />
+    <script type="module" src="./js/model-viewer.min.js"></script>
+    <script src="./js/fabric.min.js"></script>
+    <link rel="stylesheet" href="./css/nano.min.css">
+    <script src="./js/pickr.min.js"></script>
+    <title>TerraTechPacks 3D</title>
+  </head>
+  <body>
+    <div class="main" id="main">
+      <nav class="nav">
+        <div>
+          <img
+            src="./assets/Logo/terratechpacks_white.png"
+            alt="TerraTech_logo"
+            class="nav_logo"
+          />
+        </div>
+        <div class="nav_links">
+          <a class="login_btn" target="_blank" href="exportpdf.html">Mock up Generator</a>
+          <a class="login_btn" href="login.html">Login</a>
+        </div>
+      </nav>
+      <div class="content">
+        <div class="left_side_bar">
+          <p>Select Pattern</p>
+          <div class="pattern_box">
+            <div class="pattern_list">
+              <ul class="accordion" id="patternAccordion">
+                <!-- category is injucted from js -->
+              </ul>
+            </div>
+          </div>
+          <p>Upload Logo</p>
+          <div class="upload_box">
+            <label for="logoUpload" class="upload-box" id="dropArea">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <p style="margin-top: 10px">Upload Logo Here</p>
+              <input type="file" id="logoUpload" accept="image/*" />
+            </label>
+            <button class="edit_btn">Edit</button>
+          </div>
+          <!-- Modal -->
+          <div id="editModal" class="modal">
+            <div class="modal-content">
+              <div class="modal_header">
+                <span class="close-button"
+                  ><i class="fa-solid fa-xmark"></i
+                ></span>
+                <h3>Edit Logo</h3>
+              </div>
+              <div class="modal_body" id="model_body">
+                <div
+                  id="previewWrapper"
+                  style="
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    overflow: hidden;
+                  "
+                >
+                  <!-- Loader -->
+                  <div
+                    id="previewLoader"
+                    style="
+                      display: none;
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%);
+                      z-index: 10;
+                    "
+                  >
+                    <div class="loader"></div>
+                  </div>
+                  <!-- Fabric canvas for drawing -->
+                  <canvas id="fabricCanvas"></canvas>
+                </div>
+              </div>
+              <div class="modal_footer">
+                <button id="saveLogoBtn" class="save_btn">Save</button>
+                <label for="uploadBtn" class="upload_btn">Upload Logo</label>
+                <input
+                  type="file"
+                  id="uploadBtn"
+                  name="file"
+                  hidden
+                  accept="image/png"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirm Modal -->
+          <div id="confirmModal" class="modal">
+            <div class="modal-content" style="height: auto; width: 30vw; min-width: 300px; padding: 2vw;">
+              <div class="modal_header" style="height: auto; border-bottom: 0.1vw solid #eee; padding-bottom: 1vw; margin-bottom: 1vw;">
+                <h3 id="confirmTitle" style="margin: 0; font-size: 1.25vw;">Confirm Action</h3>
+              </div>
+              <div class="modal_body" style="height: auto; padding: 1.5vw 0; text-align: center; display: block;">
+                <p id="confirmMessage" style="font-size: 1vw; color: #333; margin: 0; line-height: 1.5;">Your edited pattern will be lost. Are you sure you want to switch models?</p>
+              </div>
+              <div class="modal_footer" style="height: auto; display: flex; justify-content: flex-end; gap: 1vw; margin-top: 1vw;">
+                <button id="confirmCancelBtn" class="save_btn" style="background-color: #f1f1f1; color: #333; box-shadow: none;">Cancel</button>
+                <button id="confirmOkBtn" class="save_btn">Confirm</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Full View Pattern Modal -->
+          <div id="fullViewModal" class="modal" style="z-index: 99999; background: rgba(0,0,0,0.85);">
+            <div style="position: absolute; top: 2vw; right: 2.5vw; font-size: 2vw; color: white; cursor: pointer; transition: color 0.2s; z-index: 100;" id="closeFullViewModal" onmouseover="this.style.color='#f00'" onmouseout="this.style.color='white'">
+              <i class="fa-solid fa-xmark"></i>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: relative; padding: 2vw;">
+              <!-- Single Pattern View -->
+              <div id="fullViewSingle" style="display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                <img id="fullViewImage" src="" style="max-width: 90%; max-height: 80vh; object-fit: contain; border-radius: 0.6vw;" />
+                <button id="fullViewNextBtn" class="save_btn" style="margin-top: 1.5vw; display: none; font-size: 1vw; min-width: 12vw; padding: 0.8vw 1.5vw;">Show Tub Image</button>
+              </div>
+              
+              <!-- Dual Pattern View (50/50) -->
+              <div id="fullViewDual" style="display: none; width: 95%; height: 85vh; gap: 2vw; align-items: center; justify-content: center;">
+                <div style="flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1vw;">
+                  <h4 style="color: white; margin: 0; font-size: 1.2vw; font-weight: 500;">Lid Pattern</h4>
+                  <img id="fullViewImageLid" src="" style="max-width: 100%; max-height: calc(100% - 3vw); object-fit: contain; border-radius: 0.6vw;" />
+                </div>
+                <div style="flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1vw;">
+                  <h4 style="color: white; margin: 0; font-size: 1.2vw; font-weight: 500;">Tub Pattern</h4>
+                  <img id="fullViewImageTub" src="" style="max-width: 100%; max-height: calc(100% - 3vw); object-fit: contain; border-radius: 0.6vw;" />
+                </div>
+              </div>
+
+              <!-- Vertical Pattern View (60/30) -->
+              <div id="fullViewVertical" style="display: none; width: 95%; height: 90vh; flex-direction: column; gap: 1vw; align-items: center; justify-content: flex-start;">
+                <div style="width: 100%; height: 60%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5vw;">
+                  <h4 style="color: white; margin: 0; font-size: 1vw; font-weight: 500;">Lid Pattern</h4>
+                  <img id="fullViewImageLidVertical" src="" style="max-width: 100%; max-height: calc(100% - 2vw); object-fit: contain; border-radius: 0.6vw;" />
+                </div>
+                <div style="width: 100%; height: 30%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5vw;">
+                  <h4 style="color: white; margin: 0; font-size: 1vw; font-weight: 500;">Tub Pattern</h4>
+                  <img id="fullViewImageTubVertical" src="" style="max-width: 100%; max-height: calc(100% - 2vw); object-fit: contain; border-radius: 0.6vw;" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="main_content">
+          <div class="model" id="modelcontainer">
+            <div
+              style="
+                height: 10%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                padding: 0 1.5vw;
+              "
+            >
+              <!-- Left: Auto Apply Pattern & Hide Logo -->
+              <div style="position: absolute; left: 1.5vw; display: flex; align-items: center; gap: 1vw;">
+                <div style="display: flex; align-items: center; gap: 0.5vw;">
+                  <span class="model-control-span">Auto Apply Pattern</span>
+                  <label class="rotate-switch">
+                    <input type="checkbox" id="autoApplyToggle" checked>
+                    <span class="rotate-slider"></span>
+                  </label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5vw;">
+                  <span class="model-control-span">Hide Logo</span>
+                  <label class="rotate-switch">
+                    <input type="checkbox" id="hideLogoToggle">
+                    <span class="rotate-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Center: Model Name -->
+              <h3 id="mainModelTitle">120ml Round Container</h3>
+
+              <!-- Right: Auto Rotate -->
+              <div style="position: absolute; right: 1.5vw; display: flex; align-items: center; gap: 0.5vw;">
+                <span class="model-control-span">Auto Rotate</span>
+                <label class="rotate-switch">
+                  <input type="checkbox" id="autoRotateToggle" checked>
+                  <span class="rotate-slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="model_view">
+              <div id="modelLoader" class="model-loader-overlay">
+                <div class="spinner"></div>
+                <p>Loading Model...</p>
+              </div>
+              <model-viewer
+                id="mainViewer"
+                src="./assets/Model_with_logo/120ml round with logo.glb"
+                alt="120ml Round Container"
+                camera-controls
+                auto-rotate
+                auto-rotate-delay="0"
+                exposure="1"
+                rotation-per-second="60deg"
+                shadow-intensity="1"
+                disable-tap
+                disable-pan
+                ar
+                interaction-prompt="none"
+                min-field-of-view="5deg"
+                loading="eager"
+                touch-action="none"
+                interpolation-decay="200"
+                max-field-of-view="65deg"
+              >
+                <div class="viewer-controls glass-group">
+                  <button id="zoomOutBtn" class="control-btn" title="Zoom Out">
+                    <i class="fa-solid fa-minus"></i>
+                  </button>
+                  <button id="resetViewBtn" class="control-btn" title="Reset View">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                  </button>
+                  <button id="zoomInBtn" class="control-btn" title="Zoom In">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
+              </model-viewer>
+            </div>
+          </div>
+
+          <div class="model_file">
+            <!-- Part Selection & Colors -->
+            <div class="footer-section part-controls">
+              <select id="partSelect" class="styled-select">
+                <option selected value="lid">Lid</option>
+                <option value="tub">Tub</option>
+              </select>
+              <div id="colorOptions" class="color-options">
+                <!-- Dynamic radio buttons -->
+              </div>
+              <div id="partColorPickerTrigger" class="custom-color-picker">
+                <img src="./assets/pngwing.png" alt="Custom Part Color" title="Choose Custom Color" />
+                <div id="partColorPicker" style="display:none;"></div>
+              </div>
+            </div>
+
+            <!-- Background Setup -->
+            <div class="footer-section bg-controls">
+              <label>Background:</label>
+              <div id="bgColorPickerTrigger" class="custom-color-picker">
+                <img src="./assets/pngwing.png" alt="Background Color" title="Change Environment Background" />
+                <div id="bgColorPicker" style="display: none;"></div>
+              </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="footer-section export-controls">
+              <select id="exportFormat" class="styled-select">
+                <option value="png">PNG</option>
+                <option value="jpg">JPG</option>
+                <option value="pdf">PDF</option>
+              </select>
+              <button id="exportBtn" class="primary-btn">Export</button>
+            </div>
+          </div>
+        </div>
+        <div class="Right_side_bar">
+          <p>Select Model</p>
+          <!-- thumbnails -->
+          <div class="thumbs">
+            <ul class="accordion" id="modelAccordion">
+              <!-- models injected by JS -->
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Preloader Spinner -->
+      <div id="preloader">
+        <video id="preloaderVideo" autoplay muted loop playsinline>
+          <source src="./assets/Preloader/Terrapack.webm" type="video/webm">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+    <script src="./js/jspdf.umd.min.js"></script>
+    <script src="model.js"></script>
+  </body>
+</html>

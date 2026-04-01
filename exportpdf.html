@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="./assets/Logo/logo-icon.png" type="image/x-icon" />
+  <link rel="stylesheet" href="./css/fontawesome.min.css" />
+  <link rel="stylesheet" href="./css/solid.min.css" />
+  <link rel="stylesheet" href="./css/regular.min.css" />
+  <link rel="stylesheet" href="./css/svg-with-js.min.css" />
+  <link rel="stylesheet" href="exportpdf.css?v=3" />
+  <script type="module" src="./js/model-viewer.min.js"></script>
+  <script src="./js/html2canvas.min.js"></script>
+  <script src="./js/jspdf.umd.min.js"></script>
+  <title>TerraTechPacks 3D</title>
+</head>
+
+<body>
+  <div class="export_main">
+    <nav class="export_nav">
+      <div class="nav_left">
+        <img src="./assets/Logo/terratechpacks_white.png" alt="TerraTech_logo" class="nav_logo" />
+      </div>
+      <div class="nav_center">
+        <h3 style="color: aliceblue">Dual Perspective Render Capture</h3>
+      </div>
+      <div class="nav_right">
+        <a href="index.html" class="home_link">
+          <i class="fa-solid fa-house"></i> Home
+        </a>
+        <button class="export_btn" id="export_btn" disabled>
+          <i class="fa-solid fa-file-pdf"></i> Export Selected PDF
+        </button>
+      </div>
+    </nav>
+
+    <div class="export_content_box">
+      <div class="model_box">
+        <div class="model_view" id="modelview">
+          <model-viewer id="modelViewer" src="./assets/Model_with_logo/120ml round with logo.glb" camera-controls=""
+            exposure="1" shadow-intensity="1" disable-tap="" disable-pan=""  interaction-prompt="none"
+            field-of-view="20deg" min-field-of-view="auto" max-field-of-view="auto" 
+            min-camera-orbit="auto auto 0.35m" max-camera-orbit="auto auto 0.45m"
+            ar-status="not-presenting" camera-orbit="0deg 75deg 0.45m" loading="eager"
+            touch-action="none" interpolation-decay="200">
+          </model-viewer>
+
+          <div class="model-view-controls">
+            <div class="format-selector">
+              <select id="exportFormat">
+                <option value="png">PNG</option>
+                <option value="jpeg">JPG</option>
+              </select>
+            </div>
+            <button id="downloadModelBtn" class="premium-export-btn">
+              <i class="fa-solid fa-cloud-arrow-down"></i> Export
+            </button>
+          </div>
+          <div class="model-view-top-left-controls glass-control">
+            <div class="shadow-option">
+              <label for="shadowIntensity">Shadow Intensity</label>
+              <input type="range" id="shadowIntensity" min="0" max="2" step="0.1" value="1" />
+            </div>
+            <div class="shadow-option">
+              <label for="shadowSoftness">Shadow Softness</label>
+              <input type="range" id="shadowSoftness" min="0" max="1" step="0.1" value="1" />
+            </div>
+            <div class="shadow-option">
+              <label for="rotationAngle">Angle (H, V)</label>
+              <div class="rotation-input-wrapper">
+                <input type="text" id="rotationAngle" value="0 , 0" />
+                <button id="goBtn" class="go-btn" title="Go to specific angle">Go</button>
+                <button id="copyToAllBtn" class="copy-logo-btn" title="Copy rotation to all rendered models">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="model-view-top-right-controls">
+  <div class="toggle-switch glass-control">
+    <span>Plain Container</span>
+    <label class="switch">
+      <input type="checkbox" id="removeDefaultDesign" />
+      <span class="slider round"></span>
+    </label>
+  </div>
+  <div class="zoom-display glass-control">
+    <span>Zoom Value :</span>
+    <span id="zoomValueDisplay">71%</span>
+  </div>
+</div>
+
+          <div class="model-view-left-controls">
+            <label class="checkbox-label glass-control">
+              <input type="checkbox" id="lidTransparent" />
+              <span>Lid Transparency</span>
+            </label>
+            <label class="checkbox-label glass-control">
+              <input type="checkbox" id="tubTransparent" />
+              <span>Tub Transparency</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="model_angle">
+          <p><i class="fa-solid fa-camera"></i> Angles</p>
+          <div class="angle-models">
+            <div id="angleCardContainer"></div>
+          </div>
+        </div>
+        
+        <div class="model_models">
+          <p><i class="fa-solid fa-cubes"></i> Model List</p>
+          <div id="modelcardContainer"></div>
+        </div>
+      </div>
+
+      <div class="export_inputs">
+        <div class="export_logo">
+          <div class="custom-logo-upload">
+            <h4><i class="fa-solid fa-upload"></i> Custom Logo</h4>
+            <div class="file-upload-wrapper">
+              <input type="file" id="customLogoInput" accept="image/*" style="display: none;" />
+              <label for="customLogoInput" class="file-upload">
+                <i class="fa-solid fa-cloud-arrow-up" style="margin-right: 0.5vw;"></i> Choose Logo
+              </label>
+              <span id="logoFileName" style="font-size: 0.7vw; color: #888; margin-left: 0.5vw;">No logo chosen</span>
+            </div>
+            <div class="logos">
+              <img id="customLogoPreview" alt="Custom Logo Preview" />
+            </div>
+          </div>
+        </div>
+
+        <div class="model_input">
+          <div class="input-section">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8vw;">
+              <h4><i class="fa-solid fa-plus"></i> Design Settings</h4>
+              <button class="render_btn" id="renderBtn">
+                Render
+              </button>
+            </div>
+            
+            <div class="input-group">
+              <label for="textureTitle">Texture Name <span style="color: red;">*</span></label>
+              <input type="text" id="textureTitle" placeholder="Enter Theme Name" />
+
+              <div class="input-row" id="textureUploadRow" style="margin-bottom: 0.2vw;">
+                <div class="input-group" id="lidTextureGroup" style="flex: 1; display: none;">
+                  <label for="lidTextureFile">Lid Texture <span style="color: red;">*</span></label>
+                  <div class="file-upload-wrapper">
+                    <input type="file" id="lidTextureFile" accept="image/*" style="display: none;" />
+                    <label for="lidTextureFile" class="file-upload">Lid File</label>
+                    <span id="lidFileName">No file chosen</span>
+                  </div>
+                </div>
+                <div class="input-group" id="tubTextureGroup" style="flex: 1;">
+                  <label for="textureFile" id="textureLabel">Upload Texture <span style="color: red;">*</span></label>
+                  <div class="file-upload-wrapper">
+                    <input type="file" name="texture" id="textureFile" accept="image/*" style="display: none;" />
+                    <label for="textureFile" class="file-upload">Tub File</label>
+                    <span id="fileName">No file chosen</span>
+                  </div>
+                </div>
+              </div>
+              <div id="toggleNote" style="display: none; color: #fb3838; font-size: 0.70vw; font-weight: 500; white-space: nowrap; opacity: 1; text-align: left;">
+                <i class="fa-solid fa-circle-info"></i> Disable "Plain Container" to upload textures.
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="color-control">
+                <label>Lid Color</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="topColor" value="#ffffff" />
+                  <img id="topColorImg" src="./assets/pngwing.png" title="Choose Lid Color" />
+                </div>
+              </div>
+              <div class="color-control">
+                <label>Tub Color</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="tubColor" value="#ffffff" />
+                  <img id="tubColorImg" src="./assets/pngwing.png" title="Choose Tub Color" />
+                </div>
+              </div>
+              <div class="color-control">
+                <label>BG Color</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="bgColor" value="#c7c7c7" />
+                  <img id="bgColorImg" src="./assets/pngwing.png" title="Choose Background Color" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="model_renders">
+          <div class="render_models">
+            <div class="rendered-header">
+              <h4><i class="fa-solid fa-images"></i> Rendered Models</h4>
+              <div class="render-controls">
+                <label>
+                  <input type="checkbox" id="selectAllToggle" checked />
+                  <span>Select All</span>
+                </label>
+                <button id="clearAllBtn" title="Clear all rendered models">
+                  <i class="fa-solid fa-trash-can"></i> Clear All
+                </button>
+              </div> <!-- Close render-controls -->
+            </div> <!-- Close rendered-header -->
+            <div class="render_container">
+              <button id="scrollLeftBtn" class="scroll-btn left" title="Scroll Left">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <div id="renderedImages"></div>
+              <button id="scrollRightBtn" class="scroll-btn right" title="Scroll Right">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pdfLoadingOverlay">
+      <div class="spinner"></div>
+      <span>Generating PDF... Please wait</span>
+    </div>
+
+    <!-- Custom Alert/Confirm Modal -->
+    <div id="customModal" class="custom-modal">
+      <div class="custom-modal-content">
+        <div class="custom-modal-header">
+          <h3 id="modalTitle">Alert</h3>
+          <span class="close-modal" id="closeModal">&times;</span>
+        </div>
+        <div class="custom-modal-body">
+          <p id="modalMessage"></p>
+        </div>
+        <div class="custom-modal-footer">
+          <button id="cancelModalBtn" class="modal-btn cancel-btn">Cancel</button>
+          <button id="confirmModalBtn" class="modal-btn confirm-btn">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="./export.js?v=3"></script>
+</body>
+
+
+</html>
