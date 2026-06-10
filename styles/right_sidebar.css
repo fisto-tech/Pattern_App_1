@@ -1,0 +1,169 @@
+/* roboto-regular - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/roboto-v49-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* roboto-500 - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/roboto-v49-latin-500.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* roboto-600 - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 600;
+  src: url('../fonts/roboto-v49-latin-600.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+.Right_side_bar p {
+  font-size: 1.1vw;
+  margin-bottom: 0.6vw;
+  font-weight: bold;
+  color: rgb(167, 167, 1);
+}
+.thumbs {
+  width: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.Right_side_bar .accordion {
+  list-style: none;
+  padding: 0;
+  margin: 0.6vw 1vw;
+  width: calc(100% - 2vw);
+  display: flex;
+  flex-direction: column;
+  gap: 5px 0;
+}
+
+/* Main category button */
+.Right_side_bar .accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0.6vw 1vw;
+  border-radius: 0.6vw;
+  border: 0.1vw solid #e0e0e0;
+  background: #ffffff;
+  box-shadow: 0 0.2vw 0.6vw rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.Right_side_bar .accordion-header:hover {
+  border: 0.05vw solid #ccc;
+  background: #f9f9f9;
+}
+
+.Right_side_bar .accordion li {
+  border: 0.1vw solid transparent;
+  border-radius: 0.6vw;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.Right_side_bar .accordion li:hover,
+.Right_side_bar .accordion li.active {
+  border-color: #000;
+}
+
+.Right_side_bar .accordion-header.active {
+  border: none;
+  border-bottom: 0.05vw solid #eee;
+}
+
+.Right_side_bar .accordion-header span {
+  font-size: 0.85vw;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.Right_side_bar .accordion-header i {
+  font-style: normal;
+  font-size: 1.1vw;
+  width: 30px;
+  color: #323232;
+  text-align: right;
+}
+
+/* Accordion content (collapsed by default) */
+.Right_side_bar .accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 0.5vw !important; /* Force 0 vertical padding when collapsed */
+  display: block;
+}
+
+/* Two column grid for models */
+.Right_side_bar .model-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6vw;
+}
+
+.Right_side_bar .accordion-content.active {
+  padding: 0.4vw !important; /* Restore all-around padding when active */
+}
+
+/* Thumbnail card */
+.thumb-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border: 0.08vw solid #ddd;
+  border-radius: 0.3vw;
+  background: #ffffff;
+  padding: 0.3vw;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Hover effect */
+.thumb-card:hover {
+  border-color: #2e2e2e;
+  transform: translateY(-1px);
+}
+
+/* Selected card */
+.thumb-card.selected {
+  border-color: #fbd238;
+  border-width: 0.12vw;
+}
+
+/* Thumbnail <model-viewer> */
+.thumb-card model-viewer {
+  width: 100%;
+  height: 5vw;
+  border-radius: 0.25vw;
+  background: #eaeaea;
+  object-fit: contain;
+}
+
+/* Label below thumbnail */
+.thumb-label {
+  margin-top: 0.2vw;
+  font-size: 0.55vw;
+  font-weight: 500;
+  text-align: center;
+  color: #333;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+

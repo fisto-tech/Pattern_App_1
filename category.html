@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="category.css?v=3" />
+  <link rel="stylesheet" href="./css/fontawesome.min.css">
+  <link rel="stylesheet" href="./css/solid.min.css">
+  <link rel="stylesheet" href="./css/regular.min.css">
+  <link rel="stylesheet" href="./css/svg-with-js.min.css">
+  <title>Category</title>
+</head>
+<!-- call initCategoryPage when page loads -->
+<body>
+  <div class="category-wrapper">
+    <div class="category">
+      <div class="category-header">
+        <h2>Category</h2>
+        <button id="open-category-modal" class="add-btn">Add Category</button>
+      </div>
+
+      <!-- Add Category Modal -->
+      <div id="category-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Add Catagory</h3>
+            <span class="close-modal">&times;</span>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Select Shape type</label>
+              <select id="shape-type">
+                <option value="">Select Shape Type</option>
+                <option value="Round">Round</option>
+                <option value="Round Square">Round Square</option>
+                <option value="Rectangle">Rectangle</option>
+                <option value="Sweet Box">Sweet Box</option>
+                <option value="Sweet Box Tamper Evident">Sweet Box Tamper Evident</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Enter Category name</label>
+              <input type="text" id="category-name" placeholder="Enter category name" />
+            </div>
+            <div class="form-group">
+              <label>Upload Your Logo</label>
+              <div id="drop-zone" class="upload-area">
+                <div id="upload-placeholder">
+                  <i class="fa-solid fa-upload"></i>
+                  <p>Drag & Drop or <span>Upload</span></p>
+                </div>
+                <img id="preview-image" src="" alt="Preview" style="display: none;" />
+                <input type="file" id="logo-file" accept="image/*" hidden />
+              </div>
+              <div id="file-name-display" class="file-name"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="cancel-btn" id="close-modal-btn">Cancel</button>
+              <button type="button" class="submit-btn" onclick="addCategory()">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="category-table-container">
+        <table class="category-table">
+          <thead>
+            <tr>
+              <th>S.No.</th>
+              <th>Shape Type</th>
+              <th>Category Name</th>
+              <th>Logo</th>
+              <th style="width: 3vw;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="category-table-body">
+            <!-- rows inserted by renderCategories() -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
