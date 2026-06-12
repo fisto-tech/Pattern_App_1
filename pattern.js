@@ -369,7 +369,7 @@ function openUploadModal(shape, category) {
     slotTop.style.display = "flex";
     labelPrimary.textContent = "Tub Pattern";
     labelTop.textContent = "Lid Pattern";
-    instruction.textContent = "This shape requires two patterns.";
+    instruction.textContent = "Please upload at least one pattern (Lid or Tub).";
   } else if (shapeLower === "rectangle") {
     slotPrimary.style.display = "none";
     slotTop.style.display = "flex";
@@ -438,13 +438,13 @@ function resetUploadArea(triggerId, previewId) {
 async function handleModalSubmit() {
   const { category, shape } = uploadTarget;
   const shapeLower = (shape || "").toLowerCase().replace(/_/g, " ");
-  const isDual = shapeLower === "sweet box" || shapeLower === "sweet box te";
+  const isDual = shapeLower === "sweet box" || shapeLower === "sweet box te" || shapeLower === "sweet box tamper evident";
   const modal = document.getElementById("upload-modal");
   const submitBtn = document.getElementById("btn-submit-upload");
 
   // Validation
-  if (isDual && (!pendingFiles.primary || !pendingFiles.top)) {
-    return showAlert("Both patterns are required for this shape.", "error");
+  if (isDual && (!pendingFiles.primary && !pendingFiles.top)) {
+    return showAlert("At least one pattern (Lid or Tub) is required for this shape.", "error");
   }
   if (shapeLower === "rectangle" && !pendingFiles.top) {
     return showAlert("Top pattern is required for Rectangle.", "error");

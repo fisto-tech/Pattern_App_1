@@ -2840,9 +2840,38 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Auto Rotate Toggle Logic
   const autoRotateToggle = document.getElementById("autoRotateToggle");
+  const speedControlsContainer = document.getElementById("speedControlsContainer");
+  const speedBtns = document.querySelectorAll(".speed-btn");
+
   if (autoRotateToggle && mainViewer) {
     autoRotateToggle.addEventListener("change", (e) => {
       updateAutoRotateSmooth(e.target.checked);
+      if (speedControlsContainer) {
+        speedControlsContainer.style.opacity = e.target.checked ? "1" : "0.4";
+        speedControlsContainer.style.pointerEvents = e.target.checked ? "auto" : "none";
+      }
+    });
+
+    // Initialize state
+    if (speedControlsContainer) {
+      speedControlsContainer.style.opacity = autoRotateToggle.checked ? "1" : "0.4";
+      speedControlsContainer.style.pointerEvents = autoRotateToggle.checked ? "auto" : "none";
+    }
+  }
+
+  if (speedBtns.length > 0) {
+    speedBtns.forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        // remove active class from all
+        speedBtns.forEach(b => b.classList.remove("active"));
+        // add active class to clicked
+        e.target.classList.add("active");
+        
+        // change rotation speed
+        if (mainViewer) {
+          mainViewer.setAttribute("rotation-per-second", e.target.dataset.speed);
+        }
+      });
     });
   }
 
@@ -3155,6 +3184,29 @@ if (closeFullViewBtn) {
     if (modal) {
       modal.classList.remove("show");
       modal.style.display = "none";
+    }
+  });
+}
+
+// Fullscreen Logic
+const fullscreenBtn = document.getElementById("fullscreenBtn");
+if (fullscreenBtn) {
+  fullscreenBtn.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  document.addEventListener("fullscreenchange", () => {
+    const icon = fullscreenBtn.querySelector("i");
+    if (document.fullscreenElement) {
+      icon.classList.replace("fa-expand", "fa-compress");
+    } else {
+      icon.classList.replace("fa-compress", "fa-expand");
     }
   });
 }

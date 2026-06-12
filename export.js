@@ -308,14 +308,14 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-modelViewer.addEventListener("load", () => {
-  lastLoadedSrc = modelViewer.getAttribute("src");
+  modelViewer.addEventListener("load", () => {
+    lastLoadedSrc = modelViewer.getAttribute("src");
     hideModelLoadingSpinner();
     syncViewerState(modelViewer);
     const orbit = modelViewer.getCameraOrbit();
-if (orbit) {
-  updateZoomDisplay(orbit.radius);
-}
+    if (orbit) {
+      updateZoomDisplay(orbit.radius);
+    }
   });
 
   // --- Scroll to rotate functionality ---
@@ -458,10 +458,10 @@ if (orbit) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
       ? {
-          r: parseInt(result[1], 16) / 255,
-          g: parseInt(result[2], 16) / 255,
-          b: parseInt(result[3], 16) / 255,
-        }
+        r: parseInt(result[1], 16) / 255,
+        g: parseInt(result[2], 16) / 255,
+        b: parseInt(result[3], 16) / 255,
+      }
       : null;
   }
 
@@ -639,7 +639,7 @@ if (orbit) {
     syncViewerState(modelViewer);
   });
 
-lidTransparent.addEventListener("change", () => {
+  lidTransparent.addEventListener("change", () => {
     lidTransparencyManualSet = true;
     if (lidTransparent.checked) {
       previousLidColor = topColor.value;
@@ -663,132 +663,91 @@ lidTransparent.addEventListener("change", () => {
     syncViewerState(modelViewer);
   });
 
-tubTransparent.addEventListener("change", () => {
-  tubTransparencyManualSet = true;
+  tubTransparent.addEventListener("change", () => {
+    tubTransparencyManualSet = true;
 
-  if (tubTransparent.checked) {
-    // Save previous color before making transparent
-    previousTubColor = tubColor.value;
+    if (tubTransparent.checked) {
+      // Save previous color before making transparent
+      previousTubColor = tubColor.value;
 
-    // Set transparent-like color
-    tubColor.value = "#666666";
-    tubColorManualSet = true;
-
-  } else {
-    // Check if Plain Container is enabled
-    const isPlainContainerEnabled =
-      removeDefaultDesign && removeDefaultDesign.checked;
-
-    if (isPlainContainerEnabled) {
-      // Force white opaque in Plain Container mode
-      tubColor.value = "#f7f7f7";
+      // Set transparent-like color
+      tubColor.value = "#666666";
       tubColorManualSet = true;
 
     } else {
-      // Restore previous color
-      tubColor.value = previousTubColor;
-      tubColorManualSet = true;
-    }
-  }
+      // Check if Plain Container is enabled
+      const isPlainContainerEnabled =
+        removeDefaultDesign && removeDefaultDesign.checked;
 
-  syncViewerState(modelViewer);
-});
+      if (isPlainContainerEnabled) {
+        // Force white opaque in Plain Container mode
+        tubColor.value = "#f7f7f7";
+        tubColorManualSet = true;
+
+      } else {
+        // Restore previous color
+        tubColor.value = previousTubColor;
+        tubColorManualSet = true;
+      }
+    }
+
+    syncViewerState(modelViewer);
+  });
   const toggleNote = document.getElementById("toggleNote");
 
   if (removeDefaultDesign) {
     removeDefaultDesign.addEventListener("change", () => {
       const isEnabled = removeDefaultDesign.checked;
 
-      if (toggleNote) toggleNote.style.display = isEnabled ? "block" : "none";
-      if (fileName) fileName.style.display = isEnabled ? "none" : "block";
-      if (lidFileName) lidFileName.style.display = isEnabled ? "none" : "block";
+      // Texture uploads remain enabled regardless of "Plain Container" state.
 
       if (isEnabled) {
-        resetTextureInputs();
+        const selectedModel = models[selectedModelIndex];
+        const modelCategory = categorizedModels.find(c =>
+          c.models.includes(selectedModel)
+        )?.category;
+
+        const isSweetBoxCategory =
+          modelCategory === "Sweet Box" ||
+          modelCategory === "Sweet Box Tamper Evident";
+
+        if (isSweetBoxCategory) {
+          topColor.value = "#ffffff";
+          tubColor.value = "#ffffff";
+          lidColorManualSet = true;
+          tubColorManualSet = true;
+          lidTransparent.checked = false;
+          tubTransparent.checked = false;
+          lidTransparencyManualSet = true;
+          tubTransparencyManualSet = true;
+        } else {
+          const is650Rectangle = models[selectedModelIndex]?.name === "650ml Rectangle";
+          previousLidColor = topColor.value;
+          topColor.value = "#666666";
+          tubColor.value = is650Rectangle ? "#000000" : "#ffffff";
+          lidColorManualSet = true;
+          tubColorManualSet = true;
+          lidTransparent.checked = true;
+          tubTransparent.checked = false;
+          lidTransparencyManualSet = true;
+          tubTransparencyManualSet = true;
+        }
+
       } else {
-        if (fileName) fileName.textContent = "No file chosen";
-        if (lidFileName) lidFileName.textContent = "No file chosen";
-        updateMainViewer();
+        lastLoadedSrc = null;
+        lidColorManualSet = false;
+        tubColorManualSet = false;
+        lidTransparencyManualSet = false;
+        tubTransparencyManualSet = false;
+        lidTransparent.checked = false;
+        tubTransparent.checked = false;
+        topColor.value = previousLidColor;
+        tubColor.value = previousTubColor;
+        updatePartTransparency(modelViewer, "lid", false, null);
+        updatePartTransparency(modelViewer, "tub", false, null);
       }
 
-      const tubLabel = document.querySelector(
-        'label[for="textureFile"].file-upload',
-      );
-      const lidLabel = document.querySelector(
-        'label[for="lidTextureFile"].file-upload',
-      );
-
-      if (isEnabled) {
-        textureFile.disabled = true;
-        lidTextureFile.disabled = true;
-        if (tubLabel) {
-          tubLabel.style.opacity = "0.5";
-          tubLabel.classList.add("disabled-ui");
-        }
-        if (lidLabel) {
-          lidLabel.style.opacity = "0.5";
-          lidLabel.classList.add("disabled-ui");
-        }
-      } else {
-        textureFile.disabled = false;
-        lidTextureFile.disabled = false;
-        if (tubLabel) {
-          tubLabel.style.opacity = "1";
-          tubLabel.classList.remove("disabled-ui");
-        }
-        if (lidLabel) {
-          lidLabel.style.opacity = "1";
-          lidLabel.classList.remove("disabled-ui");
-        }
-      }
-
-      if (isEnabled) {
-  const selectedModel = models[selectedModelIndex];
-  const modelCategory = categorizedModels.find(c =>
-    c.models.includes(selectedModel)
-  )?.category;
-
-  const isSweetBoxCategory =
-    modelCategory === "Sweet Box" ||
-    modelCategory === "Sweet Box Tamper Evident";
-
-  if (isSweetBoxCategory) {
-    topColor.value = "#ffffff";
-    tubColor.value = "#ffffff";
-    lidColorManualSet = true;
-    tubColorManualSet = true;
-    lidTransparent.checked = false;
-    tubTransparent.checked = false;
-    lidTransparencyManualSet = true;
-    tubTransparencyManualSet = true;
- } else {
-    const is650Rectangle = models[selectedModelIndex]?.name === "650ml Rectangle";
-    previousLidColor = topColor.value;
-    topColor.value = "#666666";
-    tubColor.value = is650Rectangle ? "#000000" : "#ffffff";
-    lidColorManualSet = true;
-    tubColorManualSet = true;
-    lidTransparent.checked = true;
-    tubTransparent.checked = false;
-    lidTransparencyManualSet = true;
-    tubTransparencyManualSet = true;
-  }
-
-} else {
-   lastLoadedSrc = null; 
-  lidColorManualSet = false;
-  tubColorManualSet = false;
-  lidTransparencyManualSet = false;
-  tubTransparencyManualSet = false;
-  lidTransparent.checked = false;
-  tubTransparent.checked = false;
-  topColor.value = previousLidColor;
-  tubColor.value = previousTubColor;
-  updatePartTransparency(modelViewer, "lid", false, null);
-  updatePartTransparency(modelViewer, "tub", false, null);
-}
-
-syncViewerState(modelViewer);
+      syncViewerState(modelViewer);
       checkFormValidity();
     });
   }
@@ -844,7 +803,7 @@ syncViewerState(modelViewer);
         const v = Math.round((orbit.phi * 180) / Math.PI);
         rotationAngleInput.value = `${h} , ${v}`;
 
-       updateZoomDisplay(orbit.radius);
+        updateZoomDisplay(orbit.radius);
       }
     });
   }
@@ -854,7 +813,7 @@ syncViewerState(modelViewer);
   }
 
 
-    // Zoom input keyboard and change listeners
+  // Zoom input keyboard and change listeners
   const zoomInput = document.getElementById("zoomValueDisplay");
   if (zoomInput) {
 
@@ -1209,7 +1168,7 @@ syncViewerState(modelViewer);
   }
 
   // Remove rendered card
-   // Remove rendered card
+  // Remove rendered card
   function removeRenderedCard(card) {
     const index = renderedModels.indexOf(card);
     if (index > -1) {
@@ -1320,33 +1279,14 @@ syncViewerState(modelViewer);
       isValid = false;
     }
 
-    if (!tubFile && !isRemoveDefaultEnabled) {
-      fileWrapper.classList.remove("valid-highlight");
-      fileWrapper.classList.add("error-highlight");
-      setTimeout(() => fileWrapper.classList.remove("error-highlight"), 2000);
-      isValid = false;
-    }
-
-    if (isDualMode && !lidFile && !isRemoveDefaultEnabled) {
-      lidFileWrapper.classList.remove("valid-highlight");
-      lidFileWrapper.classList.add("error-highlight");
-      setTimeout(
-        () => lidFileWrapper.classList.remove("error-highlight"),
-        2000,
-      );
-      isValid = false;
-    }
+    // File uploads are no longer required to render
 
     if (!isValid) {
       return;
     }
 
     const finalizeRenderWithTextures = async () => {
-      const tubReader = new FileReader();
-      tubReader.onload = async (event) => {
-        const tubTextureDataURL = event.target.result;
-        let lidTextureDataURL = null;
-
+      const processLid = async (tubTextureDataURL) => {
         const finalizeRender = async (lidDataURL) => {
           const currentModelSrc = modelViewer.getAttribute("src");
           let snapshotDataURL = null;
@@ -1410,8 +1350,8 @@ syncViewerState(modelViewer);
           // DO NOT reset removeDefaultDesign or re-enable inputs here
           // to comply with user request: "if i click render toggle automaticlly disable don't do that"
 
-           restoreOriginalModel();
-         
+          restoreOriginalModel();
+
           checkFormValidity();
         };
 
@@ -1423,7 +1363,16 @@ syncViewerState(modelViewer);
           finalizeRender(null);
         }
       };
-      tubReader.readAsDataURL(tubFile);
+
+      if (tubFile) {
+        const tubReader = new FileReader();
+        tubReader.onload = async (event) => {
+          await processLid(event.target.result);
+        };
+        tubReader.readAsDataURL(tubFile);
+      } else {
+        await processLid(null);
+      }
     };
 
     const finalizeRenderNoTextures = async () => {
@@ -1490,7 +1439,7 @@ syncViewerState(modelViewer);
       checkFormValidity();
     };
 
-    if (tubFile) {
+    if (tubFile || lidFile) {
       await finalizeRenderWithTextures();
     } else {
       await finalizeRenderNoTextures();
@@ -1585,7 +1534,7 @@ syncViewerState(modelViewer);
       message:
         "Are you sure you want to clear all rendered models? This action cannot be undone.",
       type: "confirm",
-            onConfirm: () => {
+      onConfirm: () => {
         renderedModels.length = 0;
         renderedImages.innerHTML = "";
         cardCounter = 1;
@@ -2248,49 +2197,49 @@ syncViewerState(modelViewer);
         modelCard.appendChild(mv);
         modelCard.appendChild(label);
 
-modelCard.addEventListener("click", (e) => {
-  e.stopPropagation();
+        modelCard.addEventListener("click", (e) => {
+          e.stopPropagation();
 
-  // If same model index already selected, do nothing
-  if (selectedModelIndex === mIdx) return;
+          // If same model index already selected, do nothing
+          if (selectedModelIndex === mIdx) return;
 
-  selectedModelIndex = mIdx;
-  selectedAngleIndex = 0;
-  lastLoadedSrc = null; // Force reload since it's a new model
+          selectedModelIndex = mIdx;
+          selectedAngleIndex = 0;
+          lastLoadedSrc = null; // Force reload since it's a new model
 
-  if (!removeDefaultDesign || !removeDefaultDesign.checked) {
-    // Reset all manual flags
-    lidColorManualSet = false;
-    tubColorManualSet = false;
-    lidTransparencyManualSet = false;
-    tubTransparencyManualSet = false;
+          if (!removeDefaultDesign || !removeDefaultDesign.checked) {
+            // Reset all manual flags
+            lidColorManualSet = false;
+            tubColorManualSet = false;
+            lidTransparencyManualSet = false;
+            tubTransparencyManualSet = false;
 
-    // Uncheck transparency checkboxes
-    lidTransparent.checked = false;
-    tubTransparent.checked = false;
+            // Uncheck transparency checkboxes
+            lidTransparent.checked = false;
+            tubTransparent.checked = false;
 
-    // Reset color pickers to white
-    topColor.value = "#ffffff";
-    tubColor.value = "#ffffff";
+            // Reset color pickers to white
+            topColor.value = "#ffffff";
+            tubColor.value = "#ffffff";
 
-    // Reset previous color trackers
-    previousLidColor = "#ffffff";
-    previousTubColor = "#ffffff";
+            // Reset previous color trackers
+            previousLidColor = "#ffffff";
+            previousTubColor = "#ffffff";
 
-    // Force materials back to OPAQUE on the current viewer
-    // before the new model loads
-    if (modelViewer && modelViewer.model) {
-      updatePartTransparency(modelViewer, "lid", false, null);
-      updatePartTransparency(modelViewer, "tub", false, null);
-    }
-  }
+            // Force materials back to OPAQUE on the current viewer
+            // before the new model loads
+            if (modelViewer && modelViewer.model) {
+              updatePartTransparency(modelViewer, "lid", false, null);
+              updatePartTransparency(modelViewer, "tub", false, null);
+            }
+          }
 
-  resetTextureInputs();
-  highlightSelectedInAccordion();
-  renderAngles();
-  highlightSelected(angleContainer, 0);
-  updateMainViewer();
-});
+          resetTextureInputs();
+          highlightSelectedInAccordion();
+          renderAngles();
+          highlightSelected(angleContainer, 0);
+          updateMainViewer();
+        });
 
         content.appendChild(modelCard);
       });
@@ -2401,14 +2350,14 @@ modelCard.addEventListener("click", (e) => {
     } else if (isSweetBox) {
       tubTextureGroup.style.display = "flex";
       lidTextureGroup.style.display = "flex";
-      textureLabel.innerHTML = 'Tub Texture <span style="color: red;">*</span>';
+      textureLabel.innerHTML = 'Tub Texture';
     } else if (isRectangle) {
       tubTextureGroup.style.display = "none";
       lidTextureGroup.style.display = "flex";
     } else if (isRound) {
       tubTextureGroup.style.display = "flex";
       lidTextureGroup.style.display = "none";
-      textureLabel.innerHTML = 'Tub Texture <span style="color: red;">*</span>';
+      textureLabel.innerHTML = 'Tub Texture';
     } else {
       // Default fallback
       tubTextureGroup.style.display = "flex";
@@ -2497,45 +2446,45 @@ modelCard.addEventListener("click", (e) => {
     }
   }
 
-function updateZoomDisplay(radiusInMeters) {
-  const zoomDisplay = document.getElementById("zoomValueDisplay");
-  if (!zoomDisplay) return;
+  function updateZoomDisplay(radiusInMeters) {
+    const zoomDisplay = document.getElementById("zoomValueDisplay");
+    if (!zoomDisplay) return;
 
-  // Skip update if user is currently typing in the input
-  if (zoomDisplay === document.activeElement) return;
+    // Skip update if user is currently typing in the input
+    if (zoomDisplay === document.activeElement) return;
 
-  // Use FOV-based zoom from the model viewer directly
-  // Lower FOV = more zoomed in = higher percentage
-  const fov = modelViewer.getFieldOfView();
-  const minFov = 10;  // most zoomed in
-  const maxFov = 45;  // most zoomed out
+    // Use FOV-based zoom from the model viewer directly
+    // Lower FOV = more zoomed in = higher percentage
+    const fov = modelViewer.getFieldOfView();
+    const minFov = 10;  // most zoomed in
+    const maxFov = 45;  // most zoomed out
 
-  const percentage = Math.round(((maxFov - fov) / (maxFov - minFov)) * 100);
-  const clamped = Math.max(0, Math.min(100, percentage));
+    const percentage = Math.round(((maxFov - fov) / (maxFov - minFov)) * 100);
+    const clamped = Math.max(0, Math.min(100, percentage));
 
-  // Update the input value (not textContent since it's now an input)
-  zoomDisplay.value = clamped;
-}
+    // Update the input value (not textContent since it's now an input)
+    zoomDisplay.value = clamped;
+  }
 
-function applyZoomFromInput(percentageValue) {
-  const minFov = 10;
-  const maxFov = 45;
+  function applyZoomFromInput(percentageValue) {
+    const minFov = 10;
+    const maxFov = 45;
 
-  // Clamp percentage between 0 and 100
-  const clamped = Math.max(0, Math.min(100, percentageValue));
+    // Clamp percentage between 0 and 100
+    const clamped = Math.max(0, Math.min(100, percentageValue));
 
-  // Convert percentage back to FOV
-  // percentage = ((maxFov - fov) / (maxFov - minFov)) * 100
-  // fov = maxFov - (percentage / 100) * (maxFov - minFov)
-  const targetFov = maxFov - (clamped / 100) * (maxFov - minFov);
+    // Convert percentage back to FOV
+    // percentage = ((maxFov - fov) / (maxFov - minFov)) * 100
+    // fov = maxFov - (percentage / 100) * (maxFov - minFov)
+    const targetFov = maxFov - (clamped / 100) * (maxFov - minFov);
 
-  // Apply the FOV to model viewer
-  mainModelViewer.setAttribute("field-of-view", `${targetFov.toFixed(2)}deg`);
+    // Apply the FOV to model viewer
+    mainModelViewer.setAttribute("field-of-view", `${targetFov.toFixed(2)}deg`);
 
-  // Update the display to reflect clamped value
-  const zoomDisplay = document.getElementById("zoomValueDisplay");
-  if (zoomDisplay) zoomDisplay.value = clamped;
-}
+    // Update the display to reflect clamped value
+    const zoomDisplay = document.getElementById("zoomValueDisplay");
+    if (zoomDisplay) zoomDisplay.value = clamped;
+  }
 
 
   function updateMainViewer() {
@@ -2544,10 +2493,10 @@ function applyZoomFromInput(percentageValue) {
     const selectedModel = models[selectedModelIndex];
     const selectedAngle = selectedModel.angles[selectedAngleIndex];
 
-     // ✅ If same src is already loaded, do nothing
-  if (mainModelViewer.getAttribute("src") === selectedAngle.src && lastLoadedSrc === selectedAngle.src) {
-    return;
-  }
+    // ✅ If same src is already loaded, do nothing
+    if (mainModelViewer.getAttribute("src") === selectedAngle.src && lastLoadedSrc === selectedAngle.src) {
+      return;
+    }
 
     // Show loading spinner BEFORE updating model if Plain Container is enabled
     if (removeDefaultDesign && removeDefaultDesign.checked) {
@@ -2593,38 +2542,38 @@ function applyZoomFromInput(percentageValue) {
     updateZoomDisplay(selectedAngle.minDist || 0.35);
 
     // Reapply Plain Container state when model changes
-if (removeDefaultDesign && removeDefaultDesign.checked) {
-  const selectedModel = models[selectedModelIndex];
-  const modelCategory = categorizedModels.find(c =>
-    c.models.includes(selectedModel)
-  )?.category;
+    if (removeDefaultDesign && removeDefaultDesign.checked) {
+      const selectedModel = models[selectedModelIndex];
+      const modelCategory = categorizedModels.find(c =>
+        c.models.includes(selectedModel)
+      )?.category;
 
-  const isSweetBoxCategory =
-    modelCategory === "Sweet Box" ||
-    modelCategory === "Sweet Box Tamper Evident";
+      const isSweetBoxCategory =
+        modelCategory === "Sweet Box" ||
+        modelCategory === "Sweet Box Tamper Evident";
 
-  if (isSweetBoxCategory) {
-    topColor.value = "#ffffff";
-    tubColor.value = "#ffffff";
-    lidColorManualSet = true;
-    tubColorManualSet = true;
-    lidTransparent.checked = false;
-    tubTransparent.checked = false;
-    lidTransparencyManualSet = true;
-    tubTransparencyManualSet = true;
-} else {
-    const is650Rectangle = models[selectedModelIndex]?.name === "650ml Rectangle";
-    previousLidColor = topColor.value;
-    topColor.value = "#666666";
-    tubColor.value = is650Rectangle ? "#000000" : "#ffffff";
-    lidColorManualSet = true;
-    tubColorManualSet = true;
-    lidTransparent.checked = true;
-    tubTransparent.checked = false;
-    lidTransparencyManualSet = true;
-    tubTransparencyManualSet = true;
-  }
-}
+      if (isSweetBoxCategory) {
+        topColor.value = "#ffffff";
+        tubColor.value = "#ffffff";
+        lidColorManualSet = true;
+        tubColorManualSet = true;
+        lidTransparent.checked = false;
+        tubTransparent.checked = false;
+        lidTransparencyManualSet = true;
+        tubTransparencyManualSet = true;
+      } else {
+        const is650Rectangle = models[selectedModelIndex]?.name === "650ml Rectangle";
+        previousLidColor = topColor.value;
+        topColor.value = "#666666";
+        tubColor.value = is650Rectangle ? "#000000" : "#ffffff";
+        lidColorManualSet = true;
+        tubColorManualSet = true;
+        lidTransparent.checked = true;
+        tubTransparent.checked = false;
+        lidTransparencyManualSet = true;
+        tubTransparencyManualSet = true;
+      }
+    }
   }
 
   function highlightSelected(container, index) {
@@ -2795,7 +2744,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
       console.log(`Waiting for model to load... attempt ${attempts}`);
     }
 
-        if (!pdfModelViewer.model) {
+    if (!pdfModelViewer.model) {
       console.error("Model failed to load after", maxAttempts * 200, "ms");
       // Clean up the failed viewer
       if (document.body.contains(pdfModelViewer)) {
@@ -2966,7 +2915,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
       customLogo.src =
         customLogoPreview.dataset.preview || "./assets/Logo/terratechpacks.png";
 
-        await Promise.all([
+      await Promise.all([
         new Promise((res) => {
           terraLogo1.onload = res;
           terraLogo1.onerror = () => { console.warn("Terra logo failed to load"); res(); };
@@ -3026,7 +2975,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
       terraLogo.src =
         window.selectedLogoSrc || "./assets/Logo/terratechpacks.png";
 
-            await Promise.race([
+      await Promise.race([
         new Promise((res) => {
           terraLogo.onload = res;
           terraLogo.onerror = () => { console.warn("Terra header logo failed to load"); res(); };
@@ -3045,12 +2994,12 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
         const lidTextureDataURL = card.dataset.lidTextureDataUrl || null;
         const topMaterialColor =
           card.dataset.topMaterialColor &&
-          card.dataset.topMaterialColor !== "null"
+            card.dataset.topMaterialColor !== "null"
             ? card.dataset.topMaterialColor
             : null;
         const tubMaterialColor =
           card.dataset.tubMaterialColor &&
-          card.dataset.tubMaterialColor !== "null"
+            card.dataset.tubMaterialColor !== "null"
             ? card.dataset.tubMaterialColor
             : null;
         const backgroundColor = card.dataset.backgroundColor || "#f5d2da";
@@ -3090,7 +3039,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
         const cardLogo = new Image();
         cardLogo.src = cardLogoSrc;
 
-                await Promise.race([
+        await Promise.race([
           new Promise((res) => {
             cardLogo.onload = res;
             cardLogo.onerror = () => { console.warn("Card logo failed to load:", cardLogoSrc); res(); };
@@ -3114,7 +3063,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
         }
 
         // ALWAYS capture new high-res image for the PDF, ignore low-res UI snapshot
-               // ALWAYS capture new high-res image for the PDF, ignore low-res UI snapshot
+        // ALWAYS capture new high-res image for the PDF, ignore low-res UI snapshot
         let modelImageData = null;
 
         const hasTextures = !!(tubTextureDataURL || lidTextureDataURL);
@@ -3123,7 +3072,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
           card.dataset.isLidTransparent === "true");
         const needsHighResCapture = hasTextures || hasColorOrTransparency;
 
-                if (needsHighResCapture) {
+        if (needsHighResCapture) {
           let pdfModelViewer = null;
           try {
             console.log(`Rendering high-res capture for PDF: ${modelTitle}...`);
@@ -3161,7 +3110,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
           modelImageData = snapshotDataURL;
         }
 
-                if (modelImageData) {
+        if (modelImageData) {
           try {
             const img = new Image();
             await new Promise((res, rej) => {
@@ -3285,7 +3234,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
 
         let slotY = summaryStartY;
 
-          for (let i = startIdx; i < endIdx; i++) {
+        for (let i = startIdx; i < endIdx; i++) {
           const tubUrl = sortedModels[i].dataset.textureDataUrl || null;
           const lidUrl = sortedModels[i].dataset.lidTextureDataUrl || null;
           const cardTitle = sortedModels[i].dataset.title || "";
@@ -3394,7 +3343,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
   const downloadModelBtn = document.getElementById("downloadModelBtn");
   const exportFormat = document.getElementById("exportFormat");
 
-    downloadModelBtn.addEventListener("click", async () => {
+  downloadModelBtn.addEventListener("click", async () => {
     const format = exportFormat.value;
     const mimeType = format === "png" ? "image/png" : "image/jpeg";
     const extension = format === "png" ? "png" : "jpg";
@@ -3500,7 +3449,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
         captureViewer.parentNode.removeChild(captureViewer);
       }
 
-          // Hide loader and restore button
+      // Hide loader and restore button
       loadingOverlay.style.display = "none";
       downloadModelBtn.disabled = false;
       downloadModelBtn.innerHTML = originalContent;
@@ -3596,7 +3545,7 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
   console.log("• Press 'R' to reset rotation");
 
   // --- Custom Modal Helper ---
-    function showCustomModal({
+  function showCustomModal({
     title,
     message,
     type = "alert",
@@ -3639,3 +3588,26 @@ if (removeDefaultDesign && removeDefaultDesign.checked) {
     };
   }
 });
+
+// Fullscreen Logic
+const fullscreenBtn = document.getElementById("fullscreenBtn");
+if (fullscreenBtn) {
+  fullscreenBtn.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  document.addEventListener("fullscreenchange", () => {
+    const icon = fullscreenBtn.querySelector("i");
+    if (document.fullscreenElement) {
+      icon.classList.replace("fa-expand", "fa-compress");
+    } else {
+      icon.classList.replace("fa-compress", "fa-expand");
+    }
+  });
+}
