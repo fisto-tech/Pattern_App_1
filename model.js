@@ -1810,7 +1810,7 @@ async function applyPatternToAll(
     isEdited = false,
   } = {},
 ) {
-  if (!patternUrl) return;
+  if (!patternUrl && !patternUrlTop) return;
 
   // 🛡️ SHIELD: Show loader for Sweet Box multi-pattern application to hide the sequential apply
   const modelLoader = document.getElementById("modelLoader");
@@ -1827,7 +1827,7 @@ async function applyPatternToAll(
     modelLoader.classList.add("active");
   }
 
-  const cleanSelectedUrl = patternUrl.split("?")[0];
+  const cleanSelectedUrl = patternUrl ? patternUrl.split("?")[0] : null;
   state.patternUrl = cleanSelectedUrl;
   state.lastLibraryPatternUrl = isEdited
     ? state.lastLibraryPatternUrl
@@ -1900,20 +1900,30 @@ async function applyPatternToAll(
       modelAlt.includes("sweet box te");
 
     let tasks = [];
-    if (patternUrlTop) {
-      tasks = [
-        { url: patternUrl, type: "bottom" },
-        { url: patternUrlTop, type: "top" },
-      ];
+    if (isBox || isTE_Model) {
+      if (patternUrl) tasks.push({ url: patternUrl, type: "bottom" });
+      else tasks.push({ url: "clear", type: "bottom" });
+
+      if (patternUrlTop) tasks.push({ url: patternUrlTop, type: "top" });
+      else tasks.push({ url: "clear", type: "top" });
     } else {
-      tasks = [{ url: patternUrl, type: state.currentPatternType || "bottom" }];
+      if (patternUrlTop && patternUrl) {
+        tasks = [
+          { url: patternUrl, type: "bottom" },
+          { url: patternUrlTop, type: "top" },
+        ];
+      } else if (patternUrlTop) {
+        tasks = [{ url: patternUrlTop, type: "top" }];
+      } else if (patternUrl) {
+        tasks = [{ url: patternUrl, type: state.currentPatternType || "bottom" }];
+      }
     }
 
     // 🚀 STEP 1: LOAD ALL TEXTURES IN PARALLEL
     // We pre-create the textures and put them in cache so they are ready for instant application
     await Promise.all(
       tasks.map(async (task) => {
-        if (!task.url) return;
+        if (!task.url || task.url === "clear") return;
         let vcache = viewerTextureCache.get(viewer);
         if (!vcache) {
           vcache = new Map();
@@ -1945,12 +1955,16 @@ async function applyPatternToAll(
           : PATTERN_MATERIAL_NAME;
       }
 
-      // This call will now find the texture in cache and apply it instantly without awaiting
-      await tryApplyMaterialTexture(viewer, matNames, task.url, {
-        skipWait: true,
-        rotation: 0,
-        forceReload,
-      });
+      if (task.url === 'clear') {
+        clearMaterialTexture(viewer, matNames);
+      } else {
+        // This call will now find the texture in cache and apply it instantly without awaiting
+        await tryApplyMaterialTexture(viewer, matNames, task.url, {
+          skipWait: true,
+          rotation: 0,
+          forceReload,
+        });
+      }
     }
   };
 

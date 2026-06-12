@@ -1009,6 +1009,7 @@ window.addEventListener("DOMContentLoaded", () => {
     card.dataset.selectedLogo = ""; // Store selected logo for this card
     card.dataset.isTubTransparent = isTubTransparent ? "true" : "false";
     card.dataset.isLidTransparent = isLidTransparent ? "true" : "false";
+    card.dataset.isRemoveDefault = (removeDefaultDesign && removeDefaultDesign.checked) ? "true" : "false";
     if (snapshotDataURL) {
       card.dataset.snapshot = snapshotDataURL;
     }
@@ -2650,6 +2651,7 @@ window.addEventListener("DOMContentLoaded", () => {
     isLidTransparent = false,
     backgroundColor = "transparent",
     cameraTarget = null,
+    isRemoveDefault = false,
   ) {
     console.log("Creating PDF model viewer...");
 
@@ -2770,19 +2772,45 @@ window.addEventListener("DOMContentLoaded", () => {
       tubMaterialColor,
     );
 
+    // 4. Apply Tub Texture (if any)
     if (tubTextureDataURL) {
       await tryApplyMaterialTexture(
         pdfModelViewer,
         TubTextureMaterials,
         tubTextureDataURL,
       );
+    } else if (isRemoveDefault) {
+      // Clear tub texture if it was removed in UI
+      pdfModelViewer.model.materials.forEach(mat => {
+        if (TubTextureMaterials.some(n => mat.name.toLowerCase().includes(n.toLowerCase()))) {
+          if (mat.pbrMetallicRoughness.baseColorTexture) mat.pbrMetallicRoughness.baseColorTexture.setTexture(null);
+          mat.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 0]);
+          mat.setAlphaMode("BLEND");
+          mat.pbrMetallicRoughness.setMetallicFactor(0);
+          mat.pbrMetallicRoughness.setRoughnessFactor(1);
+          mat.setEmissiveFactor([0, 0, 0]);
+        }
+      });
     }
+
     if (lidTextureDataURL) {
       await tryApplyMaterialTexture(
         pdfModelViewer,
         LidTextureMaterials,
         lidTextureDataURL,
       );
+    } else if (isRemoveDefault) {
+      // Clear lid texture if it was removed in UI
+      pdfModelViewer.model.materials.forEach(mat => {
+        if (LidTextureMaterials.some(n => mat.name.toLowerCase().includes(n.toLowerCase()))) {
+          if (mat.pbrMetallicRoughness.baseColorTexture) mat.pbrMetallicRoughness.baseColorTexture.setTexture(null);
+          mat.pbrMetallicRoughness.setBaseColorFactor([1, 1, 1, 0]);
+          mat.setAlphaMode("BLEND");
+          mat.pbrMetallicRoughness.setMetallicFactor(0);
+          mat.pbrMetallicRoughness.setRoughnessFactor(1);
+          mat.setEmissiveFactor([0, 0, 0]);
+        }
+      });
     }
 
     // Explicitly re-apply camera settings since model load can reset them
@@ -3009,6 +3037,7 @@ window.addEventListener("DOMContentLoaded", () => {
           card.dataset.selectedLogo ||
           window.selectedLogoSrc ||
           "./assets/Logo/terratechpacks.png"; // Use card-specific logo
+        const isRemoveDefault = card.dataset.isRemoveDefault === "true";
 
         console.log(`Card ${i + 1}: ${modelTitle}, Logo: ${cardLogoSrc}`);
 
@@ -3063,14 +3092,13 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         // ALWAYS capture new high-res image for the PDF, ignore low-res UI snapshot
-        // ALWAYS capture new high-res image for the PDF, ignore low-res UI snapshot
         let modelImageData = null;
 
         const hasTextures = !!(tubTextureDataURL || lidTextureDataURL);
         const hasColorOrTransparency = !!(topMaterialColor || tubMaterialColor ||
           card.dataset.isTubTransparent === "true" ||
           card.dataset.isLidTransparent === "true");
-        const needsHighResCapture = hasTextures || hasColorOrTransparency;
+        const needsHighResCapture = hasTextures || hasColorOrTransparency || isRemoveDefault;
 
         if (needsHighResCapture) {
           let pdfModelViewer = null;
@@ -3090,6 +3118,7 @@ window.addEventListener("DOMContentLoaded", () => {
               card.dataset.isLidTransparent === "true",
               "transparent",
               card.dataset.cameraTarget,
+              isRemoveDefault
             );
             if (pdfModelViewer) {
               modelImageData = await capturePDFModelImage(pdfModelViewer);
