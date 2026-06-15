@@ -2802,7 +2802,10 @@ saveLogoBtn.addEventListener("click", async () => {
 document.addEventListener("DOMContentLoaded", async () => {
   const preloader = document.getElementById("preloader");
   const video = document.getElementById("preloaderVideo");
+  const fsBtn = document.getElementById("fullscreenBtn");
+
   if (preloader) preloader.style.display = "flex";
+  if (fsBtn) fsBtn.style.display = "none";
 
   // 📹 VIDEO COMPLETION PROMISE: Ensure we see the animation at least once
   const videoCyclePromise = new Promise((resolve) => {
@@ -3004,6 +3007,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     preloader.classList.add("fade-out");
     setTimeout(() => {
       preloader.style.display = "none";
+      if (fsBtn) fsBtn.style.display = "flex";
     }, 800);
   }
 });
